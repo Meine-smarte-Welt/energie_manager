@@ -1,0 +1,14 @@
+{
+  "domain": "energie_manager",
+  "name": "Energie Manager",
+  "after_dependencies": ["lovelace", "recorder"],
+  "codeowners": ["@meine-smarte-welt"],
+  "config_flow": true,
+  "dependencies": ["http", "websocket_api"],
+  "documentation": "https://github.com/meine-smarte-welt/energie_manager",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/meine-smarte-welt/energie_manager/issues",
+  "requirements": [],
+  "version": "0.0.1"
+}

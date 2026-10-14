@@ -1,0 +1,79 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Energy Manager",
+        "description": "Energy Manager provides a dashboard card. You pick the sensors later in the card editor. Here you only set general options.",
+        "data": {
+          "update_check": "Check GitHub for new versions",
+          "max_history_months": "Maximum months for the history"
+        },
+        "data_description": {
+          "update_check": "Asks GitHub for the latest version at startup and every 12 hours afterwards.",
+          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60)."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Energy Manager",
+        "description": "Energy Manager provides a dashboard card. You pick the sensors later in the card editor. Here you only set general options.",
+        "data": {
+          "update_check": "Check GitHub for new versions",
+          "max_history_months": "Maximum months for the history"
+        },
+        "data_description": {
+          "update_check": "Asks GitHub for the latest version at startup and every 12 hours afterwards.",
+          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60)."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Energy Manager is already set up.",
+      "reconfigure_successful": "The options have been saved."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Energy Manager – options",
+        "description": "Installed version: {version}\n{update_info}",
+        "data": {
+          "update_check": "Check GitHub for new versions",
+          "max_history_months": "Maximum months for the history"
+        },
+        "data_description": {
+          "update_check": "Asks GitHub for the latest version at startup and every 12 hours afterwards.",
+          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60)."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "version": {
+        "name": "Installed version"
+      }
+    }
+  },
+  "services": {
+    "check_update": {
+      "name": "Check for update",
+      "description": "Asks GitHub for the latest version right away.",
+      "fields": {
+        "entry_id": {
+          "name": "Entry",
+          "description": "Optional: use only this Energy Manager entry."
+        }
+      }
+    },
+    "clear_cache": {
+      "name": "Clear cache",
+      "description": "Discards the card's cached long-term values.",
+      "fields": {
+        "entry_id": {
+          "name": "Entry",
+          "description": "Optional: use only this Energy Manager entry."
+        }
+      }
+    }
+  }
+}

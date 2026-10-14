@@ -1,0 +1,79 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Energie Manager instellen",
+        "description": "Energie Manager levert een dashboardkaart. De sensoren kies je later in de kaarteditor. Hier stel je alleen algemene opties in.",
+        "data": {
+          "update_check": "Op GitHub naar nieuwe versies zoeken",
+          "max_history_months": "Maximaal aantal maanden voor het verloop"
+        },
+        "data_description": {
+          "update_check": "Vraagt bij het opstarten en daarna elke 12 uur aan GitHub naar de nieuwste versie.",
+          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60)."
+        }
+      },
+      "reconfigure": {
+        "title": "Energie Manager opnieuw configureren",
+        "description": "Energie Manager levert een dashboardkaart. De sensoren kies je later in de kaarteditor. Hier stel je alleen algemene opties in.",
+        "data": {
+          "update_check": "Op GitHub naar nieuwe versies zoeken",
+          "max_history_months": "Maximaal aantal maanden voor het verloop"
+        },
+        "data_description": {
+          "update_check": "Vraagt bij het opstarten en daarna elke 12 uur aan GitHub naar de nieuwste versie.",
+          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60)."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Energie Manager is al ingesteld.",
+      "reconfigure_successful": "De opties zijn opgeslagen."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Energie Manager – opties",
+        "description": "Geïnstalleerde versie: {version}\n{update_info}",
+        "data": {
+          "update_check": "Op GitHub naar nieuwe versies zoeken",
+          "max_history_months": "Maximaal aantal maanden voor het verloop"
+        },
+        "data_description": {
+          "update_check": "Vraagt bij het opstarten en daarna elke 12 uur aan GitHub naar de nieuwste versie.",
+          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60)."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "version": {
+        "name": "Geïnstalleerde versie"
+      }
+    }
+  },
+  "services": {
+    "check_update": {
+      "name": "Op update controleren",
+      "description": "Vraagt direct aan GitHub naar de nieuwste versie.",
+      "fields": {
+        "entry_id": {
+          "name": "Invoer",
+          "description": "Optioneel: alleen deze Energie Manager-invoer gebruiken."
+        }
+      }
+    },
+    "clear_cache": {
+      "name": "Cache legen",
+      "description": "Verwijdert de gecachete langetermijnwaarden van de kaart.",
+      "fields": {
+        "entry_id": {
+          "name": "Invoer",
+          "description": "Optioneel: alleen deze Energie Manager-invoer gebruiken."
+        }
+      }
+    }
+  }
+}

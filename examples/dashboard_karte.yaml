@@ -1,0 +1,28 @@
+# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): bcc987f62fe6ace0e349eae0c73b5e096e343412428d276fb9827255df86a8e4
+type: custom:energie-manager-card
+title: Energie
+default_tab: flow
+history_months: 12
+# Energiefluss (Leistung in W oder kW, Vorzeichen: Bezug positiv)
+grid_power: sensor.netz_leistung
+battery_power: sensor.speicher_leistung
+battery_soc: sensor.speicher_ladestand
+battery_capacity: 10
+# PV-Anlage mit zwei Himmelsrichtungen (Solcast)
+pv_count: 2
+pv1_name: Süd
+pv1_power: sensor.pv_sued_leistung
+pv1_energy_today: sensor.pv_sued_energie_heute
+pv1_forecast: sensor.solcast_pv_forecast_forecast_today
+pv1_forecast_tomorrow: sensor.solcast_pv_forecast_forecast_tomorrow
+pv2_name: West
+pv2_power: sensor.pv_west_leistung
+pv2_energy_today: sensor.pv_west_energie_heute
+pv2_forecast: sensor.solcast_pv_forecast_forecast_today
+pv2_forecast_site: 1234_5678_9012_3456   # Solcast-Site-ID, Bindestriche als Unterstrich
+# Zähler für Tageswerte und Verlauf (state_class: total_increasing)
+energy_pv: sensor.pv_gesamt_energie
+energy_import: sensor.netz_bezug_energie
+energy_export: sensor.netz_einspeisung_energie
+# Strompreis (jeder Preissensor, auch Tibber)
+price_current: sensor.strompreis_aktuell

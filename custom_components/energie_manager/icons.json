@@ -1,0 +1,17 @@
+{
+  "entity": {
+    "sensor": {
+      "version": {
+        "default": "mdi:tag-outline"
+      }
+    }
+  },
+  "services": {
+    "check_update": {
+      "service": "mdi:cloud-refresh-outline"
+    },
+    "clear_cache": {
+      "service": "mdi:broom"
+    }
+  }
+}

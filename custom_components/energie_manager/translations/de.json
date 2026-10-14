@@ -1,0 +1,79 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Energie Manager einrichten",
+        "description": "Der Energie Manager stellt eine Dashboard-Karte bereit. Die Sensoren wählst du später im Karten-Editor aus. Hier legst du nur allgemeine Optionen fest.",
+        "data": {
+          "update_check": "Nach neuen Versionen auf GitHub suchen",
+          "max_history_months": "Maximale Monate für den Verlauf"
+        },
+        "data_description": {
+          "update_check": "Fragt beim Start und danach alle 12 Stunden bei GitHub nach der neuesten Version.",
+          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60)."
+        }
+      },
+      "reconfigure": {
+        "title": "Energie Manager neu konfigurieren",
+        "description": "Der Energie Manager stellt eine Dashboard-Karte bereit. Die Sensoren wählst du später im Karten-Editor aus. Hier legst du nur allgemeine Optionen fest.",
+        "data": {
+          "update_check": "Nach neuen Versionen auf GitHub suchen",
+          "max_history_months": "Maximale Monate für den Verlauf"
+        },
+        "data_description": {
+          "update_check": "Fragt beim Start und danach alle 12 Stunden bei GitHub nach der neuesten Version.",
+          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60)."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Der Energie Manager ist bereits eingerichtet.",
+      "reconfigure_successful": "Die Optionen wurden gespeichert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Energie Manager – Optionen",
+        "description": "Installierte Version: {version}\n{update_info}",
+        "data": {
+          "update_check": "Nach neuen Versionen auf GitHub suchen",
+          "max_history_months": "Maximale Monate für den Verlauf"
+        },
+        "data_description": {
+          "update_check": "Fragt beim Start und danach alle 12 Stunden bei GitHub nach der neuesten Version.",
+          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60)."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "version": {
+        "name": "Installierte Version"
+      }
+    }
+  },
+  "services": {
+    "check_update": {
+      "name": "Auf Update prüfen",
+      "description": "Fragt sofort bei GitHub nach der neuesten Version.",
+      "fields": {
+        "entry_id": {
+          "name": "Eintrag",
+          "description": "Optional: nur diesen Energie-Manager-Eintrag verwenden."
+        }
+      }
+    },
+    "clear_cache": {
+      "name": "Zwischenspeicher leeren",
+      "description": "Verwirft die zwischengespeicherten Langzeitwerte der Karte.",
+      "fields": {
+        "entry_id": {
+          "name": "Eintrag",
+          "description": "Optional: nur diesen Energie-Manager-Eintrag verwenden."
+        }
+      }
+    }
+  }
+}

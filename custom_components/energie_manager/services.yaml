@@ -1,0 +1,16 @@
+# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): d73eb3b645c5b14c95741847fb79bc54cde050db044d45ca3ad3d2f477426e77
+check_update:
+  fields:
+    entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: energie_manager
+
+clear_cache:
+  fields:
+    entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: energie_manager
