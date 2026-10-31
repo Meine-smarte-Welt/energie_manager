@@ -6,6 +6,10 @@ Eine Dashboard-Karte für Energiefluss, PV-Erzeugung mit Solcast-Vergleich, Spei
 
 > **Version 0.0.1 – erste Veröffentlichung.** Die Karte und die Rechenlogik sind mit simulierten Daten getestet, **nicht** an einer echten Anlage und nicht mit echten Solcast-Daten. Siehe [Bekannte Einschränkungen](#bekannte-einschränkungen). Rückmeldungen sind ausdrücklich erwünscht.
 
+<p>
+  <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Meine-smarte-Welt&amp;repository=energie_manager&amp;category=integration"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Repository in Home Assistant öffnen" height="32"></a>
+</p>
+
 ## Funktionsumfang
 
 - **Energiefluss** im Stil der Power Flow Card Plus: PV, Netz, Haus, Speicher und bis zu drei einzelne Verbraucher mit animierten Linien.
