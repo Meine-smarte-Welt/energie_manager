@@ -1,4 +1,4 @@
-# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): 915f1d86fe3e1bd2e7364f5e347cdaf1f4e46961287f6de82ae13b7c8374ddca
+# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): 38cdeed30ed1aeb1ddfd877f84a160562cc4025e4ba7079084c9bc59173261b1
 """WebSocket-Schnittstelle für die Karte (Lesen für alle, Schreiben nur Administratoren)."""
 
 from __future__ import annotations
@@ -79,6 +79,29 @@ async def ws_category(
 
 @websocket_api.websocket_command(
     {
+        vol.Required("type"): f"{DOMAIN}/detect",
+        vol.Optional("entry_id"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_detect(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Sensoren des Kostal Managers erkennen (experimentell, nur lesend)."""
+    manager = _manager(hass, msg.get("entry_id"))
+    if manager is None:
+        connection.send_error(msg["id"], "not_found", "Kein Energie-Manager-Eintrag.")
+        return
+    try:
+        result = manager.detect()
+    except EnergieManagerError as err:
+        connection.send_error(msg["id"], err.code, str(err))
+        return
+    connection.send_result(msg["id"], result)
+
+
+@websocket_api.websocket_command(
+    {
         vol.Required("type"): f"{DOMAIN}/action",
         vol.Required("action"): vol.In(ACTIONS),
         vol.Optional("entry_id"): str,
@@ -106,4 +129,5 @@ def async_register(hass: HomeAssistant) -> None:
     """Alle Befehle anmelden."""
     websocket_api.async_register_command(hass, ws_info)
     websocket_api.async_register_command(hass, ws_category)
+    websocket_api.async_register_command(hass, ws_detect)
     websocket_api.async_register_command(hass, ws_action)

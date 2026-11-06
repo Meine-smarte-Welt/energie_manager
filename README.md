@@ -4,7 +4,7 @@
 
 Eine Dashboard-Karte für Energiefluss, PV-Erzeugung mit Solcast-Vergleich, Speicher, Strompreis und Monatsverlauf. Alle Sensoren wählst du im grafischen Karten-Editor aus, ohne YAML.
 
-> **Version 0.0.1 – erste Veröffentlichung.** Die Karte und die Rechenlogik sind mit simulierten Daten getestet, **nicht** an einer echten Anlage und nicht mit echten Solcast-Daten. Siehe [Bekannte Einschränkungen](#bekannte-einschränkungen). Rückmeldungen sind ausdrücklich erwünscht.
+> **Version 0.0.2.** Neu: experimentelle automatische Erkennung der Sensoren des Kostal Managers (standardmäßig ausgeblendet, ungeprüft). Die Karte und die Rechenlogik sind mit simulierten Daten getestet, **nicht** an einer echten Anlage und nicht mit echten Solcast-Daten. Siehe [Bekannte Einschränkungen](#bekannte-einschränkungen) und [EXPERIMENTELL.md](EXPERIMENTELL.md). Rückmeldungen sind ausdrücklich erwünscht.
 
 <p>
   <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Meine-smarte-Welt&amp;repository=energie_manager&amp;category=integration"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Repository in Home Assistant öffnen" height="32"></a>
@@ -43,7 +43,7 @@ Eine Dashboard-Karte für Energiefluss, PV-Erzeugung mit Solcast-Vergleich, Spei
 
 1. *Einstellungen → Geräte & Dienste → Integration hinzufügen → Energie Manager*
 2. Optionen bestätigen (Update-Prüfung, maximale Monate im Verlauf)
-3. Die Karte wird automatisch als Lovelace-Ressource eingetragen. Im YAML-Modus trägst du sie selbst ein: URL `/energie_manager_files/energie-manager-card.js?v=0.0.1`, Typ *JavaScript-Modul*.
+3. Die Karte wird automatisch als Lovelace-Ressource eingetragen. Im YAML-Modus trägst du sie selbst ein: URL `/energie_manager_files/energie-manager-card.js?v=0.0.2`, Typ *JavaScript-Modul*.
 4. Dashboard bearbeiten → *Karte hinzufügen* → „Energie Manager“ → Sensoren im Editor auswählen
 5. Nach einem Update einmal den Browser neu laden (Strg+F5)
 
@@ -94,8 +94,39 @@ price_current: sensor.strompreis_aktuell
 | Zähler | `energy_pv`, `energy_import`, `energy_export`, `energy_home`, `energy_battery_charge`, `energy_battery_discharge` | Energiezähler in kWh mit state_class `total_increasing` für Tageswerte und Verlauf |
 | Preis | `price_current`, `price_min`, `price_avg`, `price_max`, `price_level`, `feed_in_tariff`, `feed_in_tariff_fixed` | Preissensoren, Einspeisevergütung (Sensor oder fester Wert in €/kWh) |
 | Darstellung | `title`, `show_title`, `zoom`, `show_stats`, `history_months`, `flow_threshold`, `read_only` | Titel, Zoom in %, Kennzahlen, Monate, Schwelle der Animation in W, nur lesen |
+| Experimentell | `show_experimental` | Experimentelle Funktionen einblenden (Standard aus, ungeprüft) |
 
 Leistungen werden in W, kW oder MW gelesen, Energien in Wh, kWh oder MWh. `read_only` blendet alle Bedienelemente zum Ändern aus.
+
+## Automatische Erkennung (experimentell)
+
+Wenn Du den [Kostal Manager](https://github.com/meine-smarte-welt/kostal_manager) nutzt, kann der Energie Manager leere Sensorfelder der Karte selbst füllen. Das ist **ungeprüft** und standardmäßig ausgeschaltet (siehe [EXPERIMENTELL.md](EXPERIMENTELL.md)).
+
+**Einschalten (alle drei Schritte sind nötig):**
+
+1. *Geräte & Dienste → Energie Manager → Konfigurieren*: „Experimentelle Funktionen anzeigen“ und „Experimentell: Sensoren des Kostal Managers automatisch erkennen“ einschalten.
+2. Im Karten-Editor unter „Experimentell“ „Experimentelle Funktionen anzeigen (ungeprüft)“ einschalten.
+3. Browser neu laden (Strg+F5). Im Tab *Einstellungen* zeigt das Akkordeon „Automatische Erkennung“ die gefundene Zuordnung.
+
+**Was erkannt wird:**
+
+| Schlüssel der Karte | Quelle |
+|---|---|
+| `pv_power` | Kostal Manager: Solarleistung (gewählte Strings) |
+| `energy_pv` | Kostal Manager: Solarproduktion gesamt |
+| `pv1_power`, `pv2_power`, … | Kostal-Integration: DC-Leistung der im Kostal Manager gewählten Strings, der Reihe nach. Der Batterie-Eingang bleibt außen vor. `pv_count` richtet sich nach der Anzahl der Strings. |
+| `pv1_energy_today`, … | Kostal-Integration: Tagesertrag je String |
+| `grid_power` | Kostal Manager: KSEM Netzleistung (nur wenn der experimentelle KSEM im Kostal Manager aktiv ist), sonst Kostal-Integration: Netzleistung |
+| `energy_import`, `energy_export` | Kostal Manager: KSEM Zähler Bezug und Einspeisung (nur mit aktivem KSEM) |
+| `home_power`, `battery_power`, `battery_soc` | Kostal-Integration |
+| `energy_home`, `energy_battery_discharge` | Kostal-Integration: Hausverbrauch gesamt, Batterie entladen gesamt |
+
+**Regeln:**
+
+- Es werden nur **leere** Felder gefüllt. Was Du im Karten-Editor einträgst, hat immer Vorrang, auch `pv_count`.
+- Die erkannten Sensoren werden nicht in die Karten-Konfiguration geschrieben. Sie gelten, solange die Funktion an ist, und sind in der Sensorliste mit „automatisch“ markiert.
+- Gefunden wird über das Entitätsregister, nicht über Entity-IDs. Deaktivierte Sensoren werden übersprungen.
+- Nicht erkannt werden Solcast-Sensoren, Strompreis, Speicherkapazität und Verbraucher. Netzbezug und Einspeisung als Zähler gibt es nur mit dem KSEM des Kostal Managers.
 
 ## Farben
 
@@ -121,7 +152,7 @@ Beide haben das optionale Feld `entry_id`.
 
 ## Ereignisse
 
-Version 0.0.1 sendet keine Ereignisse.
+Version 0.0.2 sendet keine Ereignisse.
 
 ## Sensoren
 
@@ -143,6 +174,8 @@ Die Version steht an drei Stellen: *Zahnrad → App-Version* in der Karte, oben 
 |---|---|
 | Nach neuen Versionen auf GitHub suchen | An/aus |
 | Maximale Monate für den Verlauf | 6 bis 60, begrenzt die Anfragen der Karte |
+| Experimentelle Funktionen anzeigen | Hauptschalter für ungeprüfte Funktionen, Standard aus |
+| Experimentell: Sensoren des Kostal Managers automatisch erkennen | Nur mit Hauptschalter wirksam, Standard aus |
 
 *Neu konfigurieren* über das Drei-Punkte-Menü des Eintrags öffnet dieselben Felder.
 
@@ -156,7 +189,8 @@ Die Version steht an drei Stellen: *Zahnrad → App-Version* in der Karte, oben 
 
 ## Bekannte Einschränkungen
 
-- **Ungeprüft an echter Hardware:** Version 0.0.1 wurde nicht an einer echten Anlage getestet. Getestet sind die Rechenlogik und die Karte mit simulierten Daten sowie der Import der Module gegen Home Assistant 2026.2.3. Nicht geprüft sind der Karten-Editor im echten Home-Assistant-Frontend, der automatische Lovelace-Eintrag und die Recorder-Abfragen mit echten Daten.
+- **Ungeprüft an echter Hardware:** Version 0.0.2 wurde nicht an einer echten Anlage getestet. Getestet sind die Rechenlogik und die Karte mit simulierten Daten sowie der Import der Module gegen Home Assistant 2026.2.3. Nicht geprüft sind der Karten-Editor im echten Home-Assistant-Frontend, der automatische Lovelace-Eintrag und die Recorder-Abfragen mit echten Daten.
+- **Automatische Erkennung (experimentell):** Nicht an einer echten Anlage und nicht zusammen mit einem laufenden Kostal Manager geprüft. Die Zuordnung der Kostal-Sensoren läuft über normalisierte Namen wie im Kostal Manager; ob das bei Deiner Installation und Sprache jeden Sensor trifft, ist ungeprüft. Das Vorzeichen von Netz- und Speicherleistung der Kostal-Integration ist ungeprüft; bei falscher Richtung hilft „Vorzeichen umkehren“ im Karten-Editor. Der Kostal Manager selbst ist ein Beta-Stand (1.0.0b1).
 - **Solcast:** Das Datenformat (`detailedForecast`, `detailedHourly`, Attribute je Site) folgt der Dokumentation von ha-solcast-solar und ist nicht gegen eine echte Installation geprüft.
 - **Tibber:** Der Entwickler nutzt Tibber nicht. Die Preisfunktion arbeitet mit beliebigen Sensoren, zeigt aber nur aktuelle Werte, keinen Preisverlauf.
 - **Verlauf:** Benötigt Sensoren mit `state_class` (`total_increasing` für Zähler, `measurement` für Leistungen). Sensoren ohne Langzeitstatistik werden in der Karte genannt. Monatswerte gibt es für die Gesamtzähler, nicht je Himmelsrichtung.
@@ -175,6 +209,11 @@ Die Version steht an drei Stellen: *Zahnrad → App-Version* in der Karte, oben 
 | Vorzeichen vertauscht | `grid_invert` oder `battery_invert` einschalten |
 | Fehlerhinweise im Log | Protokoll unter `custom_components.energie_manager` prüfen |
 
+## Versionshistorie
+
+- **0.0.2:** Neu: experimentelle automatische Erkennung der Sensoren des Kostal Managers (Optionen „Experimentelle Funktionen anzeigen“ und „Experimentell: Sensoren des Kostal Managers automatisch erkennen“, im Karten-Editor die Gruppe „Experimentell“, im Tab Einstellungen die Akkordeons „Automatische Erkennung“ und „Experimentelle Funktionen“). Behoben: Die PV-Gesamtleistung (`pv_power`) fehlte in der Sensorliste und in der Zählung des Status-Akkordeons.
+- **0.0.1:** Erste Veröffentlichung.
+
 ## Datei-Integrität
 
 Jede `.py`, `.js` und `.yaml` trägt in der ersten Zeile einen SHA-256-Hash des Inhalts ab Zeile 2. Prüfen: `tail -n +2 datei.py | sha256sum`. Für JSON-Dateien (ohne Kommentare) gelten diese Hashes über die komplette Datei:
@@ -183,11 +222,11 @@ Jede `.py`, `.js` und `.yaml` trägt in der ersten Zeile einen SHA-256-Hash des 
 |---|---|
 | `hacs.json` | `7e6bd5e1470416ea5aa7754bc2de451c006812341445adae657e298f7ec5242b` |
 | `custom_components/energie_manager/icons.json` | `4fe83cef322748803eb2069c89c027408330e6838dac3c05ee03022bf448fec4` |
-| `custom_components/energie_manager/manifest.json` | `5115717e92022a7184fa2d7900901e7b5dd5747e3bb309e4963ac5151a96281e` |
-| `custom_components/energie_manager/strings.json` | `b6115bd546fb295abc4177fafa661dbcc79e51de93095dcfe2997d7a1b75c142` |
-| `custom_components/energie_manager/translations/de.json` | `b6115bd546fb295abc4177fafa661dbcc79e51de93095dcfe2997d7a1b75c142` |
-| `custom_components/energie_manager/translations/en.json` | `d021c2af6b2ea75116bf39f0e0973e3e0e229383af531597b0f024b1c39f320b` |
-| `custom_components/energie_manager/translations/nl.json` | `c65c489479c79e44dad98433fd9d8b61cabb2654b7f9465cb576174b10f59b72` |
+| `custom_components/energie_manager/manifest.json` | `b1b6a9c829becbcfcb58258bb20f0ca32a463c098afeac1e5fd180b73af0d5c7` |
+| `custom_components/energie_manager/strings.json` | `f2e6318a245b0741197f3cf64fc1ccf31b1ac5d40da4d52f5792afbdb00c0e36` |
+| `custom_components/energie_manager/translations/de.json` | `f2e6318a245b0741197f3cf64fc1ccf31b1ac5d40da4d52f5792afbdb00c0e36` |
+| `custom_components/energie_manager/translations/en.json` | `b5ee62542deb6978f5641efd404e9a4b107f68ad26f33523053bdbc437a0f5b2` |
+| `custom_components/energie_manager/translations/nl.json` | `6fdd54a2723aad5d4fb83560c2679997814e112338ab23dccf2f4ed7e3747001` |
 
 ## Lizenz
 

@@ -6,11 +6,15 @@
         "description": "Der Energie Manager stellt eine Dashboard-Karte bereit. Die Sensoren wählst du später im Karten-Editor aus. Hier legst du nur allgemeine Optionen fest.",
         "data": {
           "update_check": "Nach neuen Versionen auf GitHub suchen",
-          "max_history_months": "Maximale Monate für den Verlauf"
+          "max_history_months": "Maximale Monate für den Verlauf",
+          "experimental_enabled": "Experimentelle Funktionen anzeigen",
+          "exp_autodetect": "Experimentell: Sensoren des Kostal Managers automatisch erkennen"
         },
         "data_description": {
           "update_check": "Fragt beim Start und danach alle 12 Stunden bei GitHub nach der neuesten Version.",
-          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60)."
+          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60).",
+          "experimental_enabled": "Hauptschalter für ungeprüfte Funktionen. Aus: nichts Experimentelles erscheint oder läuft.",
+          "exp_autodetect": "Füllt leere Sensorfelder der Karte mit den passenden Sensoren des Kostal Managers. Ungeprüft. Wirkt nur mit dem Hauptschalter und dem Schalter „Experimentelle Funktionen anzeigen“ in der Karte."
         }
       },
       "reconfigure": {
@@ -18,11 +22,15 @@
         "description": "Der Energie Manager stellt eine Dashboard-Karte bereit. Die Sensoren wählst du später im Karten-Editor aus. Hier legst du nur allgemeine Optionen fest.",
         "data": {
           "update_check": "Nach neuen Versionen auf GitHub suchen",
-          "max_history_months": "Maximale Monate für den Verlauf"
+          "max_history_months": "Maximale Monate für den Verlauf",
+          "experimental_enabled": "Experimentelle Funktionen anzeigen",
+          "exp_autodetect": "Experimentell: Sensoren des Kostal Managers automatisch erkennen"
         },
         "data_description": {
           "update_check": "Fragt beim Start und danach alle 12 Stunden bei GitHub nach der neuesten Version.",
-          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60)."
+          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60).",
+          "experimental_enabled": "Hauptschalter für ungeprüfte Funktionen. Aus: nichts Experimentelles erscheint oder läuft.",
+          "exp_autodetect": "Füllt leere Sensorfelder der Karte mit den passenden Sensoren des Kostal Managers. Ungeprüft. Wirkt nur mit dem Hauptschalter und dem Schalter „Experimentelle Funktionen anzeigen“ in der Karte."
         }
       }
     },
@@ -38,11 +46,15 @@
         "description": "Installierte Version: {version}\n{update_info}",
         "data": {
           "update_check": "Nach neuen Versionen auf GitHub suchen",
-          "max_history_months": "Maximale Monate für den Verlauf"
+          "max_history_months": "Maximale Monate für den Verlauf",
+          "experimental_enabled": "Experimentelle Funktionen anzeigen",
+          "exp_autodetect": "Experimentell: Sensoren des Kostal Managers automatisch erkennen"
         },
         "data_description": {
           "update_check": "Fragt beim Start und danach alle 12 Stunden bei GitHub nach der neuesten Version.",
-          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60)."
+          "max_history_months": "Begrenzt, wie weit die Karte in die Langzeitstatistik zurückblickt (6 bis 60).",
+          "experimental_enabled": "Hauptschalter für ungeprüfte Funktionen. Aus: nichts Experimentelles erscheint oder läuft.",
+          "exp_autodetect": "Füllt leere Sensorfelder der Karte mit den passenden Sensoren des Kostal Managers. Ungeprüft. Wirkt nur mit dem Hauptschalter und dem Schalter „Experimentelle Funktionen anzeigen“ in der Karte."
         }
       }
     }

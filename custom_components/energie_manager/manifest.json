@@ -10,5 +10,5 @@
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/meine-smarte-welt/energie_manager/issues",
   "requirements": [],
-  "version": "0.0.1"
+  "version": "0.0.2"
 }

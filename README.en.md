@@ -4,7 +4,7 @@
 
 A dashboard card for energy flow, PV generation compared with the Solcast forecast, battery, electricity price and monthly history. You pick all sensors in the graphical card editor, no YAML needed.
 
-> **Version 0.0.1 – first release.** The card and the calculation logic are tested with simulated data, **not** on a real installation and not with real Solcast data. See [Known limitations](#known-limitations). Feedback is very welcome.
+> **Version 0.0.2.** New: experimental automatic detection of the Kostal Manager's sensors (hidden by default, untested). The card and the calculation logic are tested with simulated data, **not** on a real installation and not with real Solcast data. See [Known limitations](#known-limitations) and [EXPERIMENTELL.md](EXPERIMENTELL.md) (in German). Feedback is very welcome.
 
 ## Features
 
@@ -39,7 +39,7 @@ A dashboard card for energy flow, PV generation compared with the Solcast foreca
 
 1. *Settings → Devices & services → Add integration → Energie Manager*
 2. Confirm the options (update check, maximum months in the history)
-3. The card is added as a Lovelace resource automatically. In YAML mode add it yourself: URL `/energie_manager_files/energie-manager-card.js?v=0.0.1`, type *JavaScript module*.
+3. The card is added as a Lovelace resource automatically. In YAML mode add it yourself: URL `/energie_manager_files/energie-manager-card.js?v=0.0.2`, type *JavaScript module*.
 4. Edit dashboard → *Add card* → "Energie Manager" → pick sensors in the editor
 5. After an update reload the browser once (Ctrl+F5)
 
@@ -90,8 +90,39 @@ price_current: sensor.electricity_price
 | Meters | `energy_pv`, `energy_import`, `energy_export`, `energy_home`, `energy_battery_charge`, `energy_battery_discharge` | Energy meters in kWh with state_class `total_increasing` for daily values and history |
 | Price | `price_current`, `price_min`, `price_avg`, `price_max`, `price_level`, `feed_in_tariff`, `feed_in_tariff_fixed` | Price sensors, feed-in tariff (sensor or fixed value in €/kWh) |
 | Appearance | `title`, `show_title`, `zoom`, `show_stats`, `history_months`, `flow_threshold`, `read_only` | Title, zoom in %, key figures, months, animation threshold in W, read-only |
+| Experimental | `show_experimental` | Show experimental features (off by default, untested) |
 
 Power is read in W, kW or MW, energy in Wh, kWh or MWh. `read_only` hides all controls that change anything.
+
+## Automatic detection (experimental)
+
+If you use the [Kostal Manager](https://github.com/meine-smarte-welt/kostal_manager), the Energy Manager can fill empty sensor fields of the card by itself. This is **untested** and switched off by default (see [EXPERIMENTELL.md](EXPERIMENTELL.md), in German).
+
+**Switch it on (all three steps are required):**
+
+1. *Devices & services → Energie Manager → Configure*: switch on "Show experimental features" and "Experimental: detect Kostal Manager sensors automatically".
+2. In the card editor, under "Experimentell", switch on "Experimentelle Funktionen anzeigen (ungeprüft)".
+3. Reload the browser (Ctrl+F5). In the *Settings* tab the accordion "Automatic detection" shows the mapping that was found.
+
+**What is detected:**
+
+| Card key | Source |
+|---|---|
+| `pv_power` | Kostal Manager: solar power (selected strings) |
+| `energy_pv` | Kostal Manager: solar production total |
+| `pv1_power`, `pv2_power`, … | Kostal integration: DC power of the strings selected in the Kostal Manager, in order. The battery input is left out. `pv_count` follows the number of strings. |
+| `pv1_energy_today`, … | Kostal integration: daily yield per string |
+| `grid_power` | Kostal Manager: KSEM grid power (only if the experimental KSEM is active in the Kostal Manager), otherwise Kostal integration: grid power |
+| `energy_import`, `energy_export` | Kostal Manager: KSEM meter import and export (only with KSEM active) |
+| `home_power`, `battery_power`, `battery_soc` | Kostal integration |
+| `energy_home`, `energy_battery_discharge` | Kostal integration: home consumption total, battery discharge total |
+
+**Rules:**
+
+- Only **empty** fields are filled. Whatever you enter in the card editor always takes priority, including `pv_count`.
+- Detected sensors are not written into the card configuration. They apply while the feature is on and are marked "automatic" in the sensor list.
+- Detection uses the entity registry, not entity IDs. Disabled sensors are skipped.
+- Not detected: Solcast sensors, electricity price, battery capacity and consumers. Import and export as meters are only available with the Kostal Manager's KSEM.
 
 ## Colors
 
@@ -117,7 +148,7 @@ Both have the optional field `entry_id`.
 
 ## Events
 
-Version 0.0.1 does not send any events.
+Version 0.0.2 does not send any events.
 
 ## Sensors
 
@@ -139,6 +170,8 @@ The version is shown in three places: *cog → App-Version* in the card, at the 
 |---|---|
 | Check GitHub for new versions | On/off |
 | Maximum months for the history | 6 to 60, limits the card's requests |
+| Show experimental features | Master switch for untested features, off by default |
+| Experimental: detect Kostal Manager sensors automatically | Only effective with the master switch, off by default |
 
 *Reconfigure* in the entry's three-dot menu opens the same fields.
 
@@ -152,7 +185,8 @@ The version is shown in three places: *cog → App-Version* in the card, at the 
 
 ## Known limitations
 
-- **Not tested on real hardware:** version 0.0.1 has not been tested on a real installation. Tested are the calculation logic and the card with simulated data, and importing the modules against Home Assistant 2026.2.3. Not verified are the card editor in the real Home Assistant frontend, the automatic Lovelace entry and the recorder queries with real data.
+- **Not tested on real hardware:** version 0.0.2 has not been tested on a real installation. Tested are the calculation logic and the card with simulated data, and importing the modules against Home Assistant 2026.2.3. Not verified are the card editor in the real Home Assistant frontend, the automatic Lovelace entry and the recorder queries with real data.
+- **Automatic detection (experimental):** Not tested on a real installation and not together with a running Kostal Manager. The Kostal sensors are matched by normalized names, as in the Kostal Manager; whether that hits every sensor on your installation and language is untested. The sign of grid and battery power from the Kostal integration is untested; if the direction is wrong, use "Invert sign" in the card editor. The Kostal Manager itself is a beta (1.0.0b1).
 - **Solcast:** the data format (`detailedForecast`, `detailedHourly`, attributes per site) follows the ha-solcast-solar documentation and has not been checked against a real installation.
 - **Tibber:** the developer does not use Tibber. The price feature works with any sensor but shows current values only, no price curve.
 - **History:** needs sensors with a `state_class` (`total_increasing` for meters, `measurement` for power). Sensors without long-term statistics are named in the card. Monthly values exist for the total meters, not per orientation.
@@ -170,6 +204,11 @@ The version is shown in three places: *cog → App-Version* in the card, at the 
 | PV forecast curve empty | The forecast sensor lacks the attribute `detailedForecast`; with per-site breakdown set `pvN_forecast_site` |
 | Sign is reversed | Turn on `grid_invert` or `battery_invert` |
 | Errors in the log | Check the log for `custom_components.energie_manager` |
+
+## Version history
+
+- **0.0.2:** New: experimental automatic detection of the Kostal Manager's sensors (options "Show experimental features" and "Experimental: detect Kostal Manager sensors automatically", the group "Experimentell" in the card editor, the accordions "Automatic detection" and "Experimental features" in the Settings tab). Fixed: the total PV power (`pv_power`) was missing from the sensor list and from the count in the status accordion.
+- **0.0.1:** First release.
 
 ## File integrity
 

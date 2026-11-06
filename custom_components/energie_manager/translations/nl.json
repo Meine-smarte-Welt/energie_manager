@@ -6,11 +6,15 @@
         "description": "Energie Manager levert een dashboardkaart. De sensoren kies je later in de kaarteditor. Hier stel je alleen algemene opties in.",
         "data": {
           "update_check": "Op GitHub naar nieuwe versies zoeken",
-          "max_history_months": "Maximaal aantal maanden voor het verloop"
+          "max_history_months": "Maximaal aantal maanden voor het verloop",
+          "experimental_enabled": "Experimentele functies tonen",
+          "exp_autodetect": "Experimenteel: sensoren van de Kostal Manager automatisch herkennen"
         },
         "data_description": {
           "update_check": "Vraagt bij het opstarten en daarna elke 12 uur aan GitHub naar de nieuwste versie.",
-          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60)."
+          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60).",
+          "experimental_enabled": "Hoofdschakelaar voor niet geteste functies. Uit: er verschijnt of draait niets experimenteels.",
+          "exp_autodetect": "Vult lege sensorvelden van de kaart met de passende sensoren van de Kostal Manager. Niet getest. Werkt alleen met de hoofdschakelaar en de kaartoptie \"Experimentele functies tonen\"."
         }
       },
       "reconfigure": {
@@ -18,11 +22,15 @@
         "description": "Energie Manager levert een dashboardkaart. De sensoren kies je later in de kaarteditor. Hier stel je alleen algemene opties in.",
         "data": {
           "update_check": "Op GitHub naar nieuwe versies zoeken",
-          "max_history_months": "Maximaal aantal maanden voor het verloop"
+          "max_history_months": "Maximaal aantal maanden voor het verloop",
+          "experimental_enabled": "Experimentele functies tonen",
+          "exp_autodetect": "Experimenteel: sensoren van de Kostal Manager automatisch herkennen"
         },
         "data_description": {
           "update_check": "Vraagt bij het opstarten en daarna elke 12 uur aan GitHub naar de nieuwste versie.",
-          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60)."
+          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60).",
+          "experimental_enabled": "Hoofdschakelaar voor niet geteste functies. Uit: er verschijnt of draait niets experimenteels.",
+          "exp_autodetect": "Vult lege sensorvelden van de kaart met de passende sensoren van de Kostal Manager. Niet getest. Werkt alleen met de hoofdschakelaar en de kaartoptie \"Experimentele functies tonen\"."
         }
       }
     },
@@ -38,11 +46,15 @@
         "description": "Geïnstalleerde versie: {version}\n{update_info}",
         "data": {
           "update_check": "Op GitHub naar nieuwe versies zoeken",
-          "max_history_months": "Maximaal aantal maanden voor het verloop"
+          "max_history_months": "Maximaal aantal maanden voor het verloop",
+          "experimental_enabled": "Experimentele functies tonen",
+          "exp_autodetect": "Experimenteel: sensoren van de Kostal Manager automatisch herkennen"
         },
         "data_description": {
           "update_check": "Vraagt bij het opstarten en daarna elke 12 uur aan GitHub naar de nieuwste versie.",
-          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60)."
+          "max_history_months": "Beperkt hoe ver de kaart terugkijkt in de langetermijnstatistieken (6 tot 60).",
+          "experimental_enabled": "Hoofdschakelaar voor niet geteste functies. Uit: er verschijnt of draait niets experimenteels.",
+          "exp_autodetect": "Vult lege sensorvelden van de kaart met de passende sensoren van de Kostal Manager. Niet getest. Werkt alleen met de hoofdschakelaar en de kaartoptie \"Experimentele functies tonen\"."
         }
       }
     }

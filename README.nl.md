@@ -4,7 +4,7 @@
 
 Een dashboardkaart voor energiestroom, PV-opwekking vergeleken met de Solcast-prognose, batterij, stroomprijs en maandverloop. Alle sensoren kies je in de grafische kaarteditor, zonder YAML.
 
-> **Versie 0.0.1 – eerste release.** De kaart en de rekenlogica zijn getest met gesimuleerde gegevens, **niet** op een echte installatie en niet met echte Solcast-gegevens. Zie [Bekende beperkingen](#bekende-beperkingen). Feedback is zeer welkom.
+> **Versie 0.0.2.** Nieuw: experimentele automatische herkenning van de sensoren van de Kostal Manager (standaard verborgen, niet getest). De kaart en de rekenlogica zijn getest met gesimuleerde gegevens, **niet** op een echte installatie en niet met echte Solcast-gegevens. Zie [Bekende beperkingen](#bekende-beperkingen) en [EXPERIMENTELL.md](EXPERIMENTELL.md) (in het Duits). Feedback is zeer welkom.
 
 ## Functies
 
@@ -39,7 +39,7 @@ Een dashboardkaart voor energiestroom, PV-opwekking vergeleken met de Solcast-pr
 
 1. *Instellingen → Apparaten & diensten → Integratie toevoegen → Energie Manager*
 2. Bevestig de opties (updatecontrole, maximaal aantal maanden in het verloop)
-3. De kaart wordt automatisch als Lovelace-resource toegevoegd. In YAML-modus voeg je haar zelf toe: URL `/energie_manager_files/energie-manager-card.js?v=0.0.1`, type *JavaScript-module*.
+3. De kaart wordt automatisch als Lovelace-resource toegevoegd. In YAML-modus voeg je haar zelf toe: URL `/energie_manager_files/energie-manager-card.js?v=0.0.2`, type *JavaScript-module*.
 4. Dashboard bewerken → *Kaart toevoegen* → "Energie Manager" → sensoren in de editor kiezen
 5. Laad de browser na een update één keer opnieuw (Ctrl+F5)
 
@@ -90,8 +90,39 @@ price_current: sensor.stroomprijs
 | Meters | `energy_pv`, `energy_import`, `energy_export`, `energy_home`, `energy_battery_charge`, `energy_battery_discharge` | Energiemeters in kWh met state_class `total_increasing` voor daggegevens en verloop |
 | Prijs | `price_current`, `price_min`, `price_avg`, `price_max`, `price_level`, `feed_in_tariff`, `feed_in_tariff_fixed` | Prijssensoren, terugleververgoeding (sensor of vaste waarde in €/kWh) |
 | Weergave | `title`, `show_title`, `zoom`, `show_stats`, `history_months`, `flow_threshold`, `read_only` | Titel, zoom in %, kerncijfers, maanden, drempel van de animatie in W, alleen-lezen |
+| Experimenteel | `show_experimental` | Experimentele functies tonen (standaard uit, niet getest) |
 
 Vermogen wordt gelezen in W, kW of MW, energie in Wh, kWh of MWh. `read_only` verbergt alle bedieningselementen die iets wijzigen.
+
+## Automatische herkenning (experimenteel)
+
+Gebruik je de [Kostal Manager](https://github.com/meine-smarte-welt/kostal_manager), dan kan de Energie Manager lege sensorvelden van de kaart zelf vullen. Dit is **niet getest** en standaard uitgeschakeld (zie [EXPERIMENTELL.md](EXPERIMENTELL.md), in het Duits).
+
+**Inschakelen (alle drie stappen zijn nodig):**
+
+1. *Apparaten & diensten → Energie Manager → Configureren*: schakel "Experimentele functies tonen" en "Experimenteel: sensoren van de Kostal Manager automatisch herkennen" in.
+2. Schakel in de kaarteditor onder "Experimentell" "Experimentelle Funktionen anzeigen (ungeprüft)" in.
+3. Laad de browser opnieuw (Ctrl+F5). In het tabblad *Instellingen* toont het accordeon "Automatische herkenning" de gevonden toewijzing.
+
+**Wat wordt herkend:**
+
+| Sleutel van de kaart | Bron |
+|---|---|
+| `pv_power` | Kostal Manager: zonnevermogen (gekozen strings) |
+| `energy_pv` | Kostal Manager: zonneproductie totaal |
+| `pv1_power`, `pv2_power`, … | Kostal-integratie: DC-vermogen van de in de Kostal Manager gekozen strings, op volgorde. De batterij-ingang blijft buiten beschouwing. `pv_count` volgt het aantal strings. |
+| `pv1_energy_today`, … | Kostal-integratie: dagopbrengst per string |
+| `grid_power` | Kostal Manager: KSEM netvermogen (alleen als de experimentele KSEM in de Kostal Manager actief is), anders Kostal-integratie: netvermogen |
+| `energy_import`, `energy_export` | Kostal Manager: KSEM-meter afname en teruglevering (alleen met actieve KSEM) |
+| `home_power`, `battery_power`, `battery_soc` | Kostal-integratie |
+| `energy_home`, `energy_battery_discharge` | Kostal-integratie: huisverbruik totaal, batterij ontladen totaal |
+
+**Regels:**
+
+- Alleen **lege** velden worden gevuld. Wat je in de kaarteditor invult, heeft altijd voorrang, ook `pv_count`.
+- Herkende sensoren worden niet in de kaartconfiguratie opgeslagen. Ze gelden zolang de functie aan staat en zijn in de sensorlijst gemarkeerd met "automatisch".
+- Herkenning gebeurt via het entiteitenregister, niet via entity-ID's. Uitgeschakelde sensoren worden overgeslagen.
+- Niet herkend: Solcast-sensoren, stroomprijs, batterijcapaciteit en verbruikers. Afname en teruglevering als meter zijn alleen beschikbaar met de KSEM van de Kostal Manager.
 
 ## Kleuren
 
@@ -117,7 +148,7 @@ Beide hebben het optionele veld `entry_id`.
 
 ## Gebeurtenissen
 
-Versie 0.0.1 verstuurt geen gebeurtenissen.
+Versie 0.0.2 verstuurt geen gebeurtenissen.
 
 ## Sensoren
 
@@ -139,6 +170,8 @@ De versie staat op drie plaatsen: *tandwiel → App-versie* in de kaart, bovenaa
 |---|---|
 | Op GitHub naar nieuwe versies zoeken | Aan/uit |
 | Maximaal aantal maanden voor het verloop | 6 tot 60, beperkt de verzoeken van de kaart |
+| Experimentele functies tonen | Hoofdschakelaar voor niet geteste functies, standaard uit |
+| Experimenteel: sensoren van de Kostal Manager automatisch herkennen | Alleen werkzaam met de hoofdschakelaar, standaard uit |
 
 *Opnieuw configureren* in het menu met drie puntjes van de invoer opent dezelfde velden.
 
@@ -152,7 +185,8 @@ De versie staat op drie plaatsen: *tandwiel → App-versie* in de kaart, bovenaa
 
 ## Bekende beperkingen
 
-- **Niet getest op echte hardware:** versie 0.0.1 is niet getest op een echte installatie. Getest zijn de rekenlogica en de kaart met gesimuleerde gegevens, en het importeren van de modules tegen Home Assistant 2026.2.3. Niet gecontroleerd zijn de kaarteditor in de echte Home Assistant-frontend, de automatische Lovelace-invoer en de recorderverzoeken met echte gegevens.
+- **Niet getest op echte hardware:** versie 0.0.2 is niet getest op een echte installatie. Getest zijn de rekenlogica en de kaart met gesimuleerde gegevens, en het importeren van de modules tegen Home Assistant 2026.2.3. Niet gecontroleerd zijn de kaarteditor in de echte Home Assistant-frontend, de automatische Lovelace-invoer en de recorderverzoeken met echte gegevens.
+- **Automatische herkenning (experimenteel):** Niet getest op een echte installatie en niet samen met een draaiende Kostal Manager. De Kostal-sensoren worden gekoppeld via genormaliseerde namen, zoals in de Kostal Manager; of dat op jouw installatie en taal elke sensor raakt, is niet getest. Het teken van net- en batterijvermogen van de Kostal-integratie is niet getest; klopt de richting niet, gebruik dan "Teken omkeren" in de kaarteditor. De Kostal Manager zelf is een beta (1.0.0b1).
 - **Solcast:** het gegevensformaat (`detailedForecast`, `detailedHourly`, attributen per site) volgt de documentatie van ha-solcast-solar en is niet getoetst aan een echte installatie.
 - **Tibber:** de ontwikkelaar gebruikt Tibber niet. De prijsfunctie werkt met elke sensor, maar toont alleen huidige waarden, geen prijsverloop.
 - **Verloop:** vereist sensoren met een `state_class` (`total_increasing` voor meters, `measurement` voor vermogen). Sensoren zonder langetermijnstatistieken worden in de kaart genoemd. Maandwaarden bestaan voor de totaalmeters, niet per windrichting.
@@ -170,6 +204,11 @@ De versie staat op drie plaatsen: *tandwiel → App-versie* in de kaart, bovenaa
 | PV-prognosecurve leeg | De prognosesensor mist het attribuut `detailedForecast`; bij uitsplitsing per site `pvN_forecast_site` instellen |
 | Teken omgekeerd | Zet `grid_invert` of `battery_invert` aan |
 | Fouten in het log | Controleer het log op `custom_components.energie_manager` |
+
+## Versiegeschiedenis
+
+- **0.0.2:** Nieuw: experimentele automatische herkenning van de sensoren van de Kostal Manager (opties "Experimentele functies tonen" en "Experimenteel: sensoren van de Kostal Manager automatisch herkennen", in de kaarteditor de groep "Experimentell", in het tabblad Instellingen de accordeons "Automatische herkenning" en "Experimentele functies"). Opgelost: het totale PV-vermogen (`pv_power`) ontbrak in de sensorlijst en in de telling van het statusaccordeon.
+- **0.0.1:** Eerste release.
 
 ## Bestandsintegriteit
 

@@ -1,5 +1,5 @@
-// SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): 56db6165ebe79fef2777b535a80cb4e66df27b50431e69b34987f85e01acb174
-const CARD_VERSION = "0.0.1";
+// SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): 101613a84f777ee226b75822c7a16ab366429d8d286a7428b69c00a94d1bd97a
+const CARD_VERSION = "0.0.2";
 const CARD_TAG = "energie-manager-card";
 const EDITOR_TAG = "energie-manager-card-editor";
 const DOMAIN = "energie_manager";
@@ -17,6 +17,11 @@ const TAB_META = {
   bridge: { icon: "mdi:cog", label: "tab_bridge" },
 };
 const CATEGORY_ICON_COLOR_KEYS = Object.fromEntries(TAB_ORDER.map((k) => [k, `color_icon_${k}`]));
+
+/* Experimentelle Funktionen – schlüsselgleich zu const.py (EXPERIMENTAL_FEATURES) */
+const EXPERIMENTAL = {
+  autodetect: { since: "0.0.2", icon: "mdi:auto-fix", label: "exp_autodetect" },
+};
 
 const PV_MAX = 4;
 const CONSUMER_MAX = 3;
@@ -116,6 +121,16 @@ const I18N = {
     ev_none: "Noch keine Ereignisse.", ev_loaded: "{k} geladen", ev_error: "{k}: {e}",
     popup_info: "Informationen", popup_forecast: "Prognose", popup_sensors: "Sensoren",
     m_name: "Name", m_power: "Leistung", m_energy: "Energie heute", m_month: "Monat",
+    experimental: "Experimentell", experimental_hint: "Ungeprüft. Noch nicht an echter Anlage bestätigt.",
+    acc_autodetect: "Automatische Erkennung", acc_experimental: "Experimentelle Funktionen",
+    exp_autodetect: "Sensoren des Kostal Managers automatisch erkennen",
+    exp_off_hint: "Einschalten in den Optionen der Integration (Hauptschalter und Einzelschalter) und im Karten-Editor unter „Experimentell“.",
+    ad_no_km: "Der Kostal Manager ist nicht installiert oder nicht geladen. Es wird nichts erkannt.",
+    ad_none: "Der Kostal Manager ist da, aber es wurden keine passenden aktivierten Sensoren gefunden.",
+    ad_hint: "Gilt nur für leere Felder. Was du im Karten-Editor einträgst, hat Vorrang.",
+    ad_sign_hint: "Das Vorzeichen von Netz- und Speicherleistung der Kostal-Integration ist ungeprüft. Stimmt die Richtung nicht, setze im Karten-Editor „Vorzeichen umkehren“.",
+    ad_src_km: "Kostal Manager", ad_src_kp: "Kostal-Integration", ad_auto: "automatisch",
+    ad_error: "Erkennung fehlgeschlagen: {e}",
     unit_none: "–",
   },
   en: {
@@ -170,6 +185,16 @@ const I18N = {
     ev_none: "No events yet.", ev_loaded: "{k} loaded", ev_error: "{k}: {e}",
     popup_info: "Information", popup_forecast: "Forecast", popup_sensors: "Sensors",
     m_name: "Name", m_power: "Power", m_energy: "Energy today", m_month: "Month",
+    experimental: "Experimental", experimental_hint: "Untested. Not yet confirmed on a real system.",
+    acc_autodetect: "Automatic detection", acc_experimental: "Experimental features",
+    exp_autodetect: "Detect Kostal Manager sensors automatically",
+    exp_off_hint: "Enable in the integration options (master switch and feature switch) and in the card editor under \"Experimental\".",
+    ad_no_km: "The Kostal Manager is not installed or not loaded. Nothing is detected.",
+    ad_none: "The Kostal Manager is present, but no matching enabled sensors were found.",
+    ad_hint: "Only applies to empty fields. Whatever you enter in the card editor takes priority.",
+    ad_sign_hint: "The sign of grid and battery power from the Kostal integration is untested. If the direction is wrong, set \"Invert sign\" in the card editor.",
+    ad_src_km: "Kostal Manager", ad_src_kp: "Kostal integration", ad_auto: "automatic",
+    ad_error: "Detection failed: {e}",
     unit_none: "–",
   },
   nl: {
@@ -224,6 +249,16 @@ const I18N = {
     ev_none: "Nog geen gebeurtenissen.", ev_loaded: "{k} geladen", ev_error: "{k}: {e}",
     popup_info: "Informatie", popup_forecast: "Prognose", popup_sensors: "Sensoren",
     m_name: "Naam", m_power: "Vermogen", m_energy: "Energie vandaag", m_month: "Maand",
+    experimental: "Experimenteel", experimental_hint: "Niet getest. Nog niet bevestigd op een echte installatie.",
+    acc_autodetect: "Automatische herkenning", acc_experimental: "Experimentele functies",
+    exp_autodetect: "Sensoren van de Kostal Manager automatisch herkennen",
+    exp_off_hint: "Inschakelen in de opties van de integratie (hoofdschakelaar en functieschakelaar) en in de kaarteditor onder \"Experimenteel\".",
+    ad_no_km: "De Kostal Manager is niet geïnstalleerd of niet geladen. Er wordt niets herkend.",
+    ad_none: "De Kostal Manager is aanwezig, maar er zijn geen passende ingeschakelde sensoren gevonden.",
+    ad_hint: "Geldt alleen voor lege velden. Wat je in de kaarteditor invult, heeft voorrang.",
+    ad_sign_hint: "Het teken van net- en batterijvermogen van de Kostal-integratie is niet getest. Klopt de richting niet, stel dan in de kaarteditor \"Teken omkeren\" in.",
+    ad_src_km: "Kostal Manager", ad_src_kp: "Kostal-integratie", ad_auto: "automatisch",
+    ad_error: "Herkenning mislukt: {e}",
     unit_none: "–",
   },
 };
@@ -246,6 +281,7 @@ const DEFAULTS = {
   show_flow: true, show_pv: true, show_battery: true, show_price: true, show_history: true, show_bridge: true,
   default_tab: "flow", zoom: 100, show_stats: true, history_months: 6, flow_threshold: 10,
   read_only: false, pv_count: 2, grid_invert: false, battery_invert: false,
+  show_experimental: false,
 };
 
 function normalizeConfig(raw) {
@@ -261,6 +297,25 @@ function normalizeConfig(raw) {
 function visibleTabs(cfg) {
   const tabs = TAB_ORDER.filter((k) => cfg[`show_${k}`] !== false);
   return tabs.length ? tabs : [TAB_ORDER[0]];
+}
+
+// Füllt nur leere Felder aus der automatischen Erkennung. Eingaben im Editor haben Vorrang.
+function applyDetection(cfg, raw, det) {
+  const out = Object.assign({}, cfg);
+  const auto = {};
+  if (det && det.slots && typeof det.slots === "object") {
+    const keys = new Set(allEntityKeys());
+    Object.keys(det.slots).forEach((k) => {
+      const s = det.slots[k];
+      if (!keys.has(k) || !s || typeof s.entity_id !== "string" || !/^[a-z_]+\.[a-z0-9_]+$/.test(s.entity_id)) return;
+      if (isSet(cfg[k])) return;
+      out[k] = s.entity_id;
+      auto[k] = s;
+    });
+    const n = Number(det.pv_count);
+    if (Number.isFinite(n) && n >= 1 && !(raw && raw.pv_count != null)) out.pv_count = clamp(Math.round(n), 1, PV_MAX);
+  }
+  return { cfg: out, auto };
 }
 
 // Verbrauchsrechnung des Energieflusses. Alle Eingaben in Watt, Vorzeichen:
@@ -418,6 +473,7 @@ details[open]>.settings-accordion-summary::after{transform:translateY(-30%) rota
 .settings-accordion-summary ha-icon{--mdc-icon-size:20px;color:var(--secondary-text-color)}
 .grow{flex:1;min-width:0;font-weight:500}
 .meta{font-size:12px;color:var(--secondary-text-color)}
+.exp-badge{display:inline-block;margin-right:4px;padding:1px 6px;border-radius:8px;font-size:11px;border:1px solid var(--em-c-warning);color:var(--em-c-warning)}
 .settings-accordion-body{padding:4px 12px 12px;border-top:1px solid var(--divider-color)}
 .settings-line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:14px}
 .settings-line .lbl{color:var(--secondary-text-color)}
@@ -457,6 +513,10 @@ class EnergieManagerCard extends HTMLElement {
     this._toastTimer = 0;
     this._infoTimer = 0;
     this._info = { value: null, error: null, ts: 0, loading: false };
+    this._userCfg = null;
+    this._rawCfg = null;
+    this._auto = {};
+    this._detect = { value: null, error: null, ts: 0, loading: false, sig: "" };
     this._resetData();
     this._onKey = (e) => {
       if (e.key === "Escape" && this._popup) { this._popup = null; this._queueRender(); }
@@ -482,7 +542,9 @@ class EnergieManagerCard extends HTMLElement {
 
   setConfig(config) {
     if (!config || typeof config !== "object") throw new Error("Invalid configuration");
-    this._cfg = normalizeConfig(config);
+    this._rawCfg = config;
+    this._userCfg = normalizeConfig(config);
+    this._applyEffective();
     const tabs = visibleTabs(this._cfg);
     if (!this._tab || !tabs.includes(this._tab)) {
       this._tab = tabs.includes(this._cfg.default_tab) ? this._cfg.default_tab : tabs[0];
@@ -493,6 +555,7 @@ class EnergieManagerCard extends HTMLElement {
     this._buildShell();
     this._sig = "";
     this._queueRender();
+    if (this._hass && this._info.value) this._afterInfo();
   }
 
   set hass(hass) {
@@ -500,11 +563,60 @@ class EnergieManagerCard extends HTMLElement {
     this._hass = hass;
     const lang = String((hass && (hass.language || (hass.locale && hass.locale.language))) || "en").slice(0, 2).toLowerCase();
     this._lang = I18N[lang] ? lang : "en";
-    if (first) this._infoTimer = setTimeout(() => this._loadInfo(false), 1500);
+    if (first) this._infoTimer = setTimeout(() => this._loadInfo(false), this._userCfg && this._userCfg.show_experimental ? 0 : 1500);
     const sig = this._signature();
     if (sig !== this._sig) { this._sig = sig; this._queueRender(); }
   }
   get hass() { return this._hass; }
+
+  // ----- Experimentell: automatische Erkennung -----
+  _expOn(feature) {
+    const e = this._info.value && this._info.value.experimental;
+    return !!(this._userCfg && this._userCfg.show_experimental && e && e.enabled && e.features && e.features[feature] && e.features[feature].enabled);
+  }
+
+  _applyEffective() {
+    const use = this._expOn("autodetect") && this._detect.value;
+    const r = use ? applyDetection(this._userCfg, this._rawCfg, this._detect.value) : { cfg: this._userCfg, auto: {} };
+    this._cfg = r.cfg;
+    this._auto = r.auto;
+  }
+
+  _reapply() {
+    this._applyEffective();
+    this._tracked = this._trackedIds();
+    this._resetData();
+    this._sig = "";
+  }
+
+  _afterInfo() {
+    if (this._expOn("autodetect")) this._loadDetect(false);
+    else if (Object.keys(this._auto).length || this._detect.value) {
+      this._detect.value = null; this._detect.sig = ""; this._detect.ts = 0;
+      this._reapply();
+      this._queueRender();
+    }
+  }
+
+  async _loadDetect(force) {
+    const d = this._detect;
+    if (!this._hass || d.loading || !this._expOn("autodetect")) return;
+    if (!force && d.ts && Date.now() - d.ts < 300000) return;
+    d.loading = true;
+    try {
+      d.value = await this._hass.connection.sendMessagePromise({ type: `${DOMAIN}/detect` });
+      d.error = null;
+    } catch (err) {
+      d.error = this._errText(err);
+    }
+    d.ts = Date.now();
+    d.loading = false;
+    const sig = JSON.stringify(d.value ? [d.value.slots, d.value.pv_count] : null);
+    if (sig !== d.sig) { d.sig = sig; this._reapply(); }
+    this._queueRender();
+  }
+
+  _expBadge() { return `<span class="exp-badge" title="${esc(this._t("experimental_hint"))}">${esc(this._t("experimental"))}</span>`; }
 
   // ----- Daten -----
   _resetData() {
@@ -562,6 +674,7 @@ class EnergieManagerCard extends HTMLElement {
     const code = err && err.code;
     if (code === "unknown_command" || code === "not_found") return this._t("err_backend");
     if (code === "recorder_unavailable") return this._t("err_recorder");
+    if (code === "experimental_disabled") return this._t("exp_off_hint");
     return this._t("err_load", { e: (err && err.message) || String(err) });
   }
 
@@ -600,6 +713,7 @@ class EnergieManagerCard extends HTMLElement {
     }
     i.ts = Date.now();
     i.loading = false;
+    this._afterInfo();
     this._queueRender();
   }
 
@@ -609,7 +723,7 @@ class EnergieManagerCard extends HTMLElement {
     else if (tab === "pv") this._load("pv", false);
     else if (tab === "battery") this._load("today", false);
     else if (tab === "history") this._load("history", false);
-    else if (tab === "bridge") this._loadInfo(false);
+    else if (tab === "bridge") { this._loadInfo(false); this._loadDetect(false); }
   }
 
   _log(key, vars) {
@@ -1215,7 +1329,7 @@ ${bars}${labels}</svg>`;
 
     // 2. Status
     const backendOk = !!info;
-    const keys = allEntityKeys().filter((k) => isSet(c[k]) && (k.startsWith("pv") ? Number(k[2]) <= c.pv_count : true));
+    const keys = allEntityKeys().filter((k) => isSet(c[k]) && (/^pv[1-4]_/.test(k) ? Number(k[2]) <= c.pv_count : true));
     const unavailable = keys.filter((k) => { const s = this._st(c[k]); return !s || ["unavailable", "unknown"].includes(s.state); });
     const statusBody = this._line(this._t("st_backend"), backendOk ? this._t("st_ok") : (this._info.error ? this._t("st_error") : this._t("st_unknown")), backendOk ? "var(--em-c-success)" : (this._info.error ? "var(--em-c-error)" : ""))
       + this._line(this._t("st_recorder"), info ? (info.recorder ? this._t("st_ok") : this._t("st_error")) : this._t("st_unknown"), info ? (info.recorder ? "var(--em-c-success)" : "var(--em-c-error)") : "")
@@ -1225,8 +1339,28 @@ ${bars}${labels}</svg>`;
     const sensorBody = keys.length ? keys.map((k) => {
       const s = this._st(c[k]);
       const text = !s ? this._t("st_missing") : ["unavailable", "unknown"].includes(s.state) ? this._t("st_unavailable") : s.state;
-      return this._line(`${k}`, `${c[k]} · ${text}`, !s ? "var(--em-c-error)" : ["unavailable", "unknown"].includes(s.state) ? "var(--em-c-warning)" : "");
+      return this._line(`${k}${this._auto[k] ? ` (${this._t("ad_auto")})` : ""}`, `${c[k]} · ${text}`, !s ? "var(--em-c-error)" : ["unavailable", "unknown"].includes(s.state) ? "var(--em-c-warning)" : "");
     }).join("") : `<div class="muted" style="padding-top:8px">${esc(this._t("no_sensors"))}</div>`;
+
+    // 3b. Automatische Erkennung (experimentell)
+    let adHtml = "";
+    if (this._expOn("autodetect")) {
+      const d = this._detect;
+      const slots = d.value && d.value.slots ? Object.entries(d.value.slots) : [];
+      let adBody = "";
+      if (d.error) adBody = `<div class="hint" style="--c:var(--em-c-error)">${esc(this._t("ad_error", { e: d.error }))}</div>`;
+      else if (!d.value) adBody = `<div class="muted" style="padding-top:8px">${esc(this._t("loading"))}</div>`;
+      else if (!d.value.kostal_manager) adBody = `<div class="hint" style="--c:var(--em-c-warning)">${esc(this._t("ad_no_km"))}</div>`;
+      else {
+        if (!slots.length) adBody = `<div class="hint" style="--c:var(--em-c-warning)">${esc(this._t("ad_none"))}</div>`;
+        else adBody = slots.map(([k, s]) => this._line(k, `${s.entity_id} · ${this._t(s.source === "kostal_manager" ? "ad_src_km" : "ad_src_kp")}`)).join("");
+        adBody += `<div class="muted" style="padding-top:8px">${esc(this._t("ad_hint"))}</div>`;
+        if (slots.some(([k, s]) => (k === "grid_power" || k === "battery_power") && s.source === "kostal_plenticore")) {
+          adBody += `<div class="hint" style="--c:var(--em-c-warning)">${esc(this._t("ad_sign_hint"))}</div>`;
+        }
+      }
+      adHtml = this._acc("autodetect", EXPERIMENTAL.autodetect.icon, this._t("acc_autodetect"), `${this._expBadge()} ${slots.length}`, adBody, "", false);
+    }
 
     // 4. Optionen
     const optBody = `<div class="muted" style="padding-top:8px">${esc(this._t("opt_text"))}</div>`;
@@ -1235,6 +1369,17 @@ ${bars}${labels}</svg>`;
     const maint = ro
       ? `<div class="muted" style="padding-top:8px">${esc(this._t("readonly_hint"))}</div>`
       : `<div class="btns"><button class="btn${this._confirm === "clear" ? " danger" : ""}" data-act="clear-cache"><ha-icon icon="mdi:broom"></ha-icon>${esc(this._confirm === "clear" ? this._t("btn_confirm") : this._t("btn_clear_cache"))}</button><button class="btn" data-act="reload"><ha-icon icon="mdi:reload"></ha-icon>${esc(this._t("btn_reload"))}</button></div>`;
+
+    // 5b. Experimentell (nur mit show_experimental)
+    let expHtml = "";
+    if (c.show_experimental) {
+      const ex = info && info.experimental;
+      let exBody;
+      if (!ex) exBody = `<div class="muted" style="padding-top:8px">${esc(this._t("st_unknown"))}</div>`;
+      else if (!ex.enabled) exBody = `<div class="hint" style="--c:var(--em-c-warning)">${esc(this._t("exp_off_hint"))}</div>`;
+      else exBody = Object.entries(ex.features || {}).map(([key, f]) => this._line(this._t(EXPERIMENTAL[key] ? EXPERIMENTAL[key].label : key), f.enabled ? "✓" : "–")).join("");
+      expHtml = this._acc("exp", "mdi:flask-outline", this._t("acc_experimental"), ex ? String(ex.count) : "", exBody, "", false);
+    }
 
     // 6. Ereignisse
     const evBody = this._events.length
@@ -1245,8 +1390,10 @@ ${bars}${labels}</svg>`;
 ${this._acc("version", "mdi:tag-outline", this._t("acc_version"), meta, versionBody, cls, true)}
 ${this._acc("status", "mdi:heart-pulse", this._t("acc_status"), "", statusBody, "", true)}
 ${this._acc("sensors", "mdi:format-list-bulleted", this._t("acc_sensors"), `${keys.length}`, sensorBody, "", false)}
+${adHtml}
 ${this._acc("options", "mdi:tune", this._t("acc_options"), "", optBody, "", false)}
 ${this._acc("maintenance", "mdi:wrench", this._t("acc_maintenance"), "", maint, "", false)}
+${expHtml}
 ${this._acc("events", "mdi:history", this._t("acc_events"), `${this._events.length}`, evBody, "", false)}
 </div>`;
   }
@@ -1364,7 +1511,7 @@ ${this._acc("events", "mdi:history", this._t("acc_events"), `${this._events.leng
         }
         break;
       case "reload":
-        this._resetData(); this._toast(this._t("toast_reloaded")); this._loadInfo(true); this._queueRender(); break;
+        this._resetData(); this._toast(this._t("toast_reloaded")); this._loadInfo(true); this._loadDetect(true); this._queueRender(); break;
       default: break;
     }
   }
@@ -1389,6 +1536,7 @@ function editorLabels() {
     default_tab: "Starttab", zoom: "Zoom (%)", show_stats: "Kennzahlen anzeigen",
     history_months: "Monate im Verlauf", flow_threshold: "Schwelle für Fluss-Animation (W)",
     read_only: "Nur lesen (Bedienelemente ausblenden)",
+    show_experimental: "Experimentelle Funktionen anzeigen (ungeprüft)",
     grid_power: "Netz-Leistung (Bezug positiv)", grid_invert: "Netz-Vorzeichen umkehren",
     grid_import_power: "Netzbezug-Leistung (alternativ)", grid_export_power: "Einspeise-Leistung (alternativ)",
     home_power: "Hausverbrauch-Leistung (optional, sonst berechnet)", pv_power: "PV-Gesamtleistung (optional, sonst Summe der Anlagen)",
@@ -1424,6 +1572,7 @@ function editorHelpers() {
     grid_power: "Ein Sensor, der beim Bezug positiv und bei Einspeisung negativ ist.",
     battery_power: "Positiv = Speicher entlädt, negativ = Speicher lädt. Sonst Vorzeichen umkehren.",
     pv_count: "Jede Himmelsrichtung ist eine eigene Anlage mit eigenen Sensoren.",
+    show_experimental: "Aktuell: automatische Erkennung der Sensoren des Kostal Managers. Zusätzlich in den Optionen der Integration einschalten.",
     history_months: "3, 6, 12, 24 oder bis zu 36 Monate. Die Integration begrenzt den Wert zusätzlich.",
     energy_pv: "Zähler mit state_class total_increasing (auch tägliche Utility-Meter), damit die Langzeitstatistik greift.",
   };
@@ -1480,6 +1629,7 @@ function buildSchema(cfg) {
       E("price_current"), E("price_min"), E("price_avg"), E("price_max"), E("price_level"),
       E("feed_in_tariff"), N("feed_in_tariff_fixed", 0, 10, 0.001, "€/kWh"),
     ]),
+    group("Experimentell", "mdi:flask-outline", [B("show_experimental")]),
   ];
 }
 
@@ -1690,5 +1840,5 @@ console.info(
   "color:#3b6642;background:#fff;font-weight:700;border:1px solid #3b6642;border-radius:0 3px 3px 0"
 );
 if (window.__EM_TEST__) {
-  window.__EM_TEST__ = { computeFlow, normalizeConfig, visibleTabs, toWatt, toKwh, toCurrencyPerKwh, sanitizeColor, buildSchema, schemaFieldNames, esc, niceMax, fmtDuration, I18N, EnergieManagerCard, CARD_VERSION };
+  window.__EM_TEST__ = { computeFlow, normalizeConfig, visibleTabs, toWatt, toKwh, toCurrencyPerKwh, sanitizeColor, buildSchema, schemaFieldNames, esc, niceMax, fmtDuration, I18N, EnergieManagerCard, CARD_VERSION, applyDetection, EXPERIMENTAL };
 }

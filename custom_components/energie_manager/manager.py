@@ -1,4 +1,4 @@
-# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): 1bfeddfb00842cea75a63e51993200085da0c6972c2b688e690a1ecaf5421bb4
+# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): 97f7343f3f79f91444051ed42f23f4290b7db5834189831bce93a557b6162d25
 """Zentrale Logik: Zustand, Zwischenspeicher und Langzeitwerte aus dem Recorder."""
 
 from __future__ import annotations
@@ -17,15 +17,19 @@ from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from homeassistant.util import dt as dt_util
 
-from . import calc
+from . import autodetect, calc
 from .const import (
     ALLOWED_DOMAINS,
     CACHE_SECONDS,
+    CONF_EXP_PREFIX,
+    CONF_EXPERIMENTAL,
     CONF_MAX_HISTORY_MONTHS,
     CONF_UPDATE_CHECK,
+    DEFAULT_EXPERIMENTAL,
     DEFAULT_MAX_HISTORY_MONTHS,
     DEFAULT_UPDATE_CHECK,
     ENERGY_SLOTS,
+    EXPERIMENTAL_FEATURES,
     FIRST_CHECK_DELAY_SECONDS,
     MAX_ENTITIES,
     PV_MAX,
@@ -81,6 +85,28 @@ class EnergieManager:
             self.entry.options.get(CONF_MAX_HISTORY_MONTHS, DEFAULT_MAX_HISTORY_MONTHS)
         )
         return int(value) if value else DEFAULT_MAX_HISTORY_MONTHS
+
+    @property
+    def experimental_master(self) -> bool:
+        return bool(self.entry.options.get(CONF_EXPERIMENTAL, DEFAULT_EXPERIMENTAL))
+
+    def feature_active(self, feature: str) -> bool:
+        """Experimentelle Funktion aktiv? Nur wenn Hauptschalter und Einzelschalter an sind."""
+        return (
+            feature in EXPERIMENTAL_FEATURES
+            and self.experimental_master
+            and bool(self.entry.options.get(CONF_EXP_PREFIX + feature, False))
+        )
+
+    def experimental_snapshot(self) -> dict[str, Any]:
+        return {
+            "enabled": self.experimental_master,
+            "count": len(EXPERIMENTAL_FEATURES),
+            "features": {
+                key: {"enabled": self.feature_active(key), "since": meta["since"]}
+                for key, meta in EXPERIMENTAL_FEATURES.items()
+            },
+        }
 
     @property
     def recorder_available(self) -> bool:
@@ -142,7 +168,22 @@ class EnergieManager:
         return self.app
 
     def info(self) -> dict[str, Any]:
-        return {**self.app, "recorder": self.recorder_available}
+        return {
+            **self.app,
+            "recorder": self.recorder_available,
+            "experimental": self.experimental_snapshot(),
+        }
+
+    @callback
+    def detect(self) -> dict[str, Any]:
+        """Sensoren des Kostal Managers erkennen (experimentell, sonst Fehler)."""
+        if not self.feature_active("autodetect"):
+            raise EnergieManagerError(
+                "experimental_disabled", "Experimentell, nicht aktiviert."
+            )
+        result = autodetect.detect(self.hass).as_dict()
+        result["generated"] = dt_util.now().isoformat()
+        return result
 
     @callback
     def clear_cache(self) -> None:

@@ -1,4 +1,4 @@
-# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): c15d017d806d802347e4f92ad76eddb2fa7f7fb382aafff862ce5d5ce3e34531
+# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): df4ae37940b66bdaa6ffd8d783b5fc12b6e44f86080d1fe5c87a7a2c1c716ae0
 """Einrichtung, Optionen und Neu-Konfigurieren."""
 
 from __future__ import annotations
@@ -16,11 +16,15 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
+    CONF_EXP_PREFIX,
+    CONF_EXPERIMENTAL,
     CONF_MAX_HISTORY_MONTHS,
     CONF_UPDATE_CHECK,
+    DEFAULT_EXPERIMENTAL,
     DEFAULT_MAX_HISTORY_MONTHS,
     DEFAULT_UPDATE_CHECK,
     DOMAIN,
+    EXPERIMENTAL_FEATURES,
     MAX_HISTORY_MONTHS,
     MIN_HISTORY_MONTHS,
     NAME,
@@ -69,6 +73,17 @@ def _schema(defaults: dict[str, Any]) -> vol.Schema:
                     mode=NumberSelectorMode.BOX,
                 )
             ),
+            vol.Required(
+                CONF_EXPERIMENTAL,
+                default=bool(defaults.get(CONF_EXPERIMENTAL, DEFAULT_EXPERIMENTAL)),
+            ): BooleanSelector(),
+            **{
+                vol.Required(
+                    CONF_EXP_PREFIX + feature,
+                    default=bool(defaults.get(CONF_EXP_PREFIX + feature, False)),
+                ): BooleanSelector()
+                for feature in EXPERIMENTAL_FEATURES
+            },
         }
     )
 
@@ -79,6 +94,11 @@ def _clean(user_input: dict[str, Any]) -> dict[str, Any]:
         CONF_MAX_HISTORY_MONTHS: int(
             user_input.get(CONF_MAX_HISTORY_MONTHS, DEFAULT_MAX_HISTORY_MONTHS)
         ),
+        CONF_EXPERIMENTAL: bool(user_input.get(CONF_EXPERIMENTAL, DEFAULT_EXPERIMENTAL)),
+        **{
+            CONF_EXP_PREFIX + feature: bool(user_input.get(CONF_EXP_PREFIX + feature, False))
+            for feature in EXPERIMENTAL_FEATURES
+        },
     }
 
 

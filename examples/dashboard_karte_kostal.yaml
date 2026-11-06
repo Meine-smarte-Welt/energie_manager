@@ -1,0 +1,12 @@
+# SHA256 (Inhalt ab Zeile 2, d.h. dieser Datei ohne diese erste Zeile): 0dd82a041dbb2c14f225771d7e19a3c543aba461bbeb2406da62a308f1c6b473
+type: custom:energie-manager-card
+title: Energie
+# Experimentell: Sensoren des Kostal Managers werden automatisch erkannt.
+# Zusätzlich nötig: In den Optionen der Integration beide Experimentell-Schalter einschalten.
+show_experimental: true
+# Alles, was du hier einträgst, hat Vorrang vor der Erkennung. Zum Beispiel:
+# battery_capacity: 10      # Speicherkapazität in kWh (wird nicht erkannt)
+# grid_invert: true         # falls das Vorzeichen der Netzleistung nicht stimmt
+# battery_invert: true      # falls das Vorzeichen der Speicherleistung nicht stimmt
+# pv1_name: Süd
+# pv2_name: West

@@ -6,11 +6,15 @@
         "description": "Energy Manager provides a dashboard card. You pick the sensors later in the card editor. Here you only set general options.",
         "data": {
           "update_check": "Check GitHub for new versions",
-          "max_history_months": "Maximum months for the history"
+          "max_history_months": "Maximum months for the history",
+          "experimental_enabled": "Show experimental features",
+          "exp_autodetect": "Experimental: detect Kostal Manager sensors automatically"
         },
         "data_description": {
           "update_check": "Asks GitHub for the latest version at startup and every 12 hours afterwards.",
-          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60)."
+          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60).",
+          "experimental_enabled": "Master switch for untested features. Off: nothing experimental appears or runs.",
+          "exp_autodetect": "Fills empty sensor fields of the card with the matching sensors of the Kostal Manager. Untested. Only works with the master switch and the card option \"Show experimental features\"."
         }
       },
       "reconfigure": {
@@ -18,11 +22,15 @@
         "description": "Energy Manager provides a dashboard card. You pick the sensors later in the card editor. Here you only set general options.",
         "data": {
           "update_check": "Check GitHub for new versions",
-          "max_history_months": "Maximum months for the history"
+          "max_history_months": "Maximum months for the history",
+          "experimental_enabled": "Show experimental features",
+          "exp_autodetect": "Experimental: detect Kostal Manager sensors automatically"
         },
         "data_description": {
           "update_check": "Asks GitHub for the latest version at startup and every 12 hours afterwards.",
-          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60)."
+          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60).",
+          "experimental_enabled": "Master switch for untested features. Off: nothing experimental appears or runs.",
+          "exp_autodetect": "Fills empty sensor fields of the card with the matching sensors of the Kostal Manager. Untested. Only works with the master switch and the card option \"Show experimental features\"."
         }
       }
     },
@@ -38,11 +46,15 @@
         "description": "Installed version: {version}\n{update_info}",
         "data": {
           "update_check": "Check GitHub for new versions",
-          "max_history_months": "Maximum months for the history"
+          "max_history_months": "Maximum months for the history",
+          "experimental_enabled": "Show experimental features",
+          "exp_autodetect": "Experimental: detect Kostal Manager sensors automatically"
         },
         "data_description": {
           "update_check": "Asks GitHub for the latest version at startup and every 12 hours afterwards.",
-          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60)."
+          "max_history_months": "Limits how far back the card looks into the long-term statistics (6 to 60).",
+          "experimental_enabled": "Master switch for untested features. Off: nothing experimental appears or runs.",
+          "exp_autodetect": "Fills empty sensor fields of the card with the matching sensors of the Kostal Manager. Untested. Only works with the master switch and the card option \"Show experimental features\"."
         }
       }
     }
